@@ -1,0 +1,9 @@
+[Activity]
+name = SlimeJump
+bundle_id = org.sugarlabs.SlimeJump
+icon = activity-slimejump
+exec = sugar-activity3 SlimeJumpActivity.SlimeJumpActivity
+activity_version = 1
+license = GPLv3+
+summary = A simple game where you control a character
+repository = https://github.com/yourusername/slimejump
