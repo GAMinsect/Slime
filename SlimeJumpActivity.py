@@ -24,13 +24,32 @@ class SlimeJumpActivity(activity.Activity):
         
         # Create the game canvas
         self._canvas = sugargame.canvas.PygameCanvas(self, main=self.game.run)
-        
-        # Grab focus for keyboard events
-        self._canvas.grab_focus()
-        
+
         # Set the canvas as the activity's canvas
         self.set_canvas(self._canvas)
+        
+        # These lines are crucial for keyboard input
+        self._canvas.set_can_focus(True)
+        self._canvas.grab_focus()
+        
+        # Connect key press events at the Gtk level
+        self.connect('key-press-event', self._key_press_cb)
+        self.connect('key-release-event', self._key_release_cb)
         self.show_all()
+
+    #----------------
+    def _key_press_cb(self, widget, event):
+        # Forward the key press to the game
+        if hasattr(self.game, 'key_press'):
+            self.game.key_press(event.keyval)
+        return False  # Allow event propagation
+    
+    def _key_release_cb(self, widget, event):
+        # Forward the key release to the game
+        if hasattr(self.game, 'key_release'):
+            self.game.key_release(event.keyval)
+        return False  # Allow event propagation
+    #-------------------
     
     def build_toolbar(self):
         toolbar_box = ToolbarBox()
