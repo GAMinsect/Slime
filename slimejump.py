@@ -11,6 +11,14 @@ class SlimeJumpGame:
         self.infected = False
         self.running = False
         
+        # Dictionary to track key states
+        self.keys = {
+            'left': False,
+            'right': False,
+            'up': False,
+            'down': False
+        }
+        
     def setup(self):
         pygame.init()
         self.screen = pygame.display.set_mode((self.screen_width, self.screen_height))
@@ -43,20 +51,64 @@ class SlimeJumpGame:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.running = False
+    #----------------
+    # Add these methods to handle GTK key events
+    def key_press(self, keyval):
+        # Map GTK key values to our internal state
+        # Common GDK key values: 65361 (left), 65363 (right), 65362 (up), 65364 (down)
+        # or ASCII values: 'a'=97, 'd'=100, 'w'=119, 's'=115
+        print(f"Key pressed: {keyval}")  # Debug print
+        
+        if keyval in (65361, 97):  # Left arrow or 'a'
+            self.keys['left'] = True
+        elif keyval in (65363, 100):  # Right arrow or 'd'
+            self.keys['right'] = True
+        elif keyval in (65362, 119):  # Up arrow or 'w'
+            self.keys['up'] = True
+        elif keyval in (65364, 115):  # Down arrow or 's'
+            self.keys['down'] = True
+    
+    def key_release(self, keyval):
+        if keyval in (65361, 97):  # Left arrow or 'a'
+            self.keys['left'] = False
+        elif keyval in (65363, 100):  # Right arrow or 'd'
+            self.keys['right'] = False
+        elif keyval in (65362, 119):  # Up arrow or 'w'
+            self.keys['up'] = False
+        elif keyval in (65364, 115):  # Down arrow or 's'
+            self.keys['down'] = False
+    #------------------
     
     def update(self):
-        key = pygame.key.get_pressed()
+        #key = pygame.key.get_pressed()
         
         if not self.infected:
-            self.movement(self.player, self.coord, key)
+            self.movement_with_state(self.player, self.coord)#, key)
         else:
-            self.movement(self.zombie, self.coord, key)
+            self.movement(self.zombie, self.coord)#, key)
         
         if self.out_of_bound(self.coord, self.screen_width, self.screen_height, self.player):
             if not self.infected:
                 self.zombie = pygame.Rect((self.xx, self.yy, 50, 50))
                 self.infected = True
     
+    #----------------
+    # Add a new movement method that uses our key state dictionary
+    def movement_with_state(self, P, C):
+        if self.keys['left']:
+            P.move_ip(-1, 0)
+            C[0] -= 1
+        if self.keys['right']:
+            P.move_ip(1, 0)
+            C[0] += 1
+        if self.keys['up']:
+            P.move_ip(0, -1)
+            C[1] -= 1
+        if self.keys['down']:
+            P.move_ip(0, 1)
+            C[1] += 1
+    #-------------------
+
     def draw(self):
         self.screen.fill((0, 0, 0))
         
